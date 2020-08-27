@@ -6,13 +6,10 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
-import android.telephony.SmsManager;
 import android.text.Html;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -24,6 +21,12 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
 import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.SocketException;
+import java.net.UnknownHostException;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -32,9 +35,11 @@ public class MainActivity extends AppCompatActivity {
     Button btLocation;
     TextView textView1, textView2, textView3, textView4, textView5;
     FusedLocationProviderClient fusedLocationProviderClient;
-    private String txtMessage;
-    private EditText txtMobile;
-    private Button btnSms;
+    String txtMessage;
+    private Button btnsnd2;
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,28 +52,9 @@ public class MainActivity extends AppCompatActivity {
         textView3 = findViewById(R.id.text_view3);
         textView4 = findViewById(R.id.text_view4);
         textView5 = findViewById(R.id.text_view5);
-        txtMobile = (EditText) findViewById(R.id.msgTxt);
-        btnSms = (Button) findViewById(R.id.btnSend);
-
-        if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED){
-            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.SEND_SMS}, 1);
-        }
+        btnsnd2 = (Button) findViewById(R.id.btnSend2);
 
 
-        btnSms.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                try{
-                    SmsManager smgr = SmsManager.getDefault();
-                    smgr.sendTextMessage(txtMobile.getText().toString(),null,txtMessage,null,null);
-                    Toast.makeText(MainActivity.this, "SMS Sent Successfully", Toast.LENGTH_SHORT).show();
-                }
-                catch (Exception e){
-                    Toast.makeText(MainActivity.this, "SMS Failed to Send, Please try again", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
 
 
         //Initialize focusedLocationProviderClient
@@ -88,21 +74,28 @@ public class MainActivity extends AppCompatActivity {
                             , new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 44);
                 }
             }
-
         });
     }
+
+    public void enviarr(View v) //TCP
+    {
+        EnviarTCP enviar = new EnviarTCP();
+        enviar.execute(txtMessage);
+    }
+
+    public void enviarrr(View v) //UDP
+    {
+        UDPClient enviar = new UDPClient();
+        enviar.execute(txtMessage);
+    }
+
+
+
 
     private void getLocation() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this
                 , Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             getLocation();
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
             return;
         }
         fusedLocationProviderClient.getLastLocation().addOnCompleteListener(new OnCompleteListener<Location>() {
@@ -145,7 +138,7 @@ public class MainActivity extends AppCompatActivity {
                                         + addresses.get(0).getAddressLine(0)
                         ));
                         //Set sms
-                        txtMessage  = ("Latitud: " + addresses.get(0).getLatitude()+ "\nLongitud: "+ addresses.get(0).getLongitude());
+                        txtMessage  = ("Latitud: " + addresses.get(0).getLatitude()+ " Longitud: "+ addresses.get(0).getLongitude() + " TimeStamp: "+ new Date().toString());
 
                     } catch (IOException e) {
                         e.printStackTrace();
