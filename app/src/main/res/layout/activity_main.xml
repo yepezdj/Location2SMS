@@ -15,6 +15,14 @@
         android:layout_height="wrap_content"
         android:text="Obtener coordenadas" />
 
+    <EditText
+        android:id="@+id/Edit_ip"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="Direccion IP"
+        android:inputType="textPersonName" />
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -63,26 +71,14 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="192dp">
-
-        <Button
-            android:id="@+id/btnSend"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:onClick="enviarr"
-            android:text="Send to TCP Server"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+        android:layout_height="68dp">
 
         <Button
             android:id="@+id/btnSend2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:onClick="enviarrr"
-            android:text="Send to UDP Server"
-            app:layout_constraintBottom_toTopOf="@+id/btnSend"
+            android:onClick="enviarr"
+            android:text="Enviar coordenadas"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />

@@ -5,11 +5,14 @@ import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Html;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -21,9 +24,11 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.Socket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.Date;
@@ -36,8 +41,8 @@ public class MainActivity extends AppCompatActivity {
     TextView textView1, textView2, textView3, textView4, textView5;
     FusedLocationProviderClient fusedLocationProviderClient;
     String txtMessage;
-    private Button btnsnd2;
-
+    Button btnsnd2;
+    EditText editip;
 
 
     @Override
@@ -53,6 +58,7 @@ public class MainActivity extends AppCompatActivity {
         textView4 = findViewById(R.id.text_view4);
         textView5 = findViewById(R.id.text_view5);
         btnsnd2 = (Button) findViewById(R.id.btnSend2);
+        editip = findViewById(R.id.Edit_ip);
 
 
 
@@ -77,19 +83,17 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public void enviarr(View v) //TCP
+    @SuppressWarnings("deprecation")
+    public void enviarr(View v)
     {
         EnviarTCP enviar = new EnviarTCP();
         enviar.execute(txtMessage);
+
+        UDPClient enviaar = new UDPClient();
+        enviaar.execute(txtMessage);
+
+        Toast.makeText(getApplicationContext(), "Coordenadas enviadas", Toast.LENGTH_SHORT).show();
     }
-
-    public void enviarrr(View v) //UDP
-    {
-        UDPClient enviar = new UDPClient();
-        enviar.execute(txtMessage);
-    }
-
-
 
 
     private void getLocation() {
@@ -98,6 +102,9 @@ public class MainActivity extends AppCompatActivity {
             getLocation();
             return;
         }
+
+
+
         fusedLocationProviderClient.getLastLocation().addOnCompleteListener(new OnCompleteListener<Location>() {
             @Override
             public void onComplete(@NonNull Task<Location> task) {
@@ -138,7 +145,9 @@ public class MainActivity extends AppCompatActivity {
                                         + addresses.get(0).getAddressLine(0)
                         ));
                         //Set sms
-                        txtMessage  = ("Latitud: " + addresses.get(0).getLatitude()+ " Longitud: "+ addresses.get(0).getLongitude() + " TimeStamp: "+ new Date().toString());
+                        txtMessage  = ("Latitud: " + addresses.get(0).getLatitude()+ "\n" +
+                                "Longitud: "+ addresses.get(0).getLongitude() +"\n" +
+                                "TimeStamp: "+ new Date().toString());
 
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -148,6 +157,63 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+
+    @SuppressWarnings("deprecation")
+    public class EnviarTCP extends AsyncTask<String,Void,Void>
+    {
+        Socket s;
+        PrintWriter pw;
+
+        @Override
+        protected Void doInBackground(String... voids) {
+
+            String message = voids[0];
+
+            try
+            {
+                s = new Socket(editip.getText().toString(), 10000);
+                pw= new PrintWriter(s.getOutputStream());
+                pw.write(message);
+                pw.flush();
+                pw.close();
+                s.close();
+
+            }catch (IOException e)
+            {
+                e.printStackTrace();
+            }
+            return null;
+        }
+    }
+
+
+    @SuppressWarnings("deprecation")
+    public class UDPClient  extends AsyncTask<String,Void,Void> {
+
+        @Override
+        protected Void doInBackground(String... voids) {
+
+            try{
+                String message = voids[0];
+
+                InetAddress ip=InetAddress.getByName(editip.getText().toString());
+                DatagramSocket socket=new DatagramSocket();
+                byte[] outData = (message).getBytes();
+
+                DatagramPacket out = new DatagramPacket(outData,outData.length,ip ,11000);
+                socket.send(out);
+
+            } catch (SocketException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return null;
+
+        }
+
+
+    }
 }
 
 
