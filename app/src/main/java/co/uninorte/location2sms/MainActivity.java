@@ -92,7 +92,7 @@ public class MainActivity extends AppCompatActivity {
         UDPClient enviaar = new UDPClient();
         enviaar.execute(txtMessage);
 
-        Toast.makeText(getApplicationContext(), "Coordenadas enviadas", Toast.LENGTH_SHORT).show();
+        //
     }
 
 
@@ -102,7 +102,6 @@ public class MainActivity extends AppCompatActivity {
             getLocation();
             return;
         }
-
 
 
         fusedLocationProviderClient.getLastLocation().addOnCompleteListener(new OnCompleteListener<Location>() {
@@ -178,11 +177,14 @@ public class MainActivity extends AppCompatActivity {
                 pw.close();
                 s.close();
 
+
             }catch (IOException e)
             {
                 e.printStackTrace();
             }
             return null;
+
+
         }
     }
 
@@ -202,6 +204,8 @@ public class MainActivity extends AppCompatActivity {
 
                 DatagramPacket out = new DatagramPacket(outData,outData.length,ip ,11000);
                 socket.send(out);
+
+                //Toast.makeText(getApplicationContext(), "Send UDP", Toast.LENGTH_SHORT).show();
 
             } catch (SocketException e) {
                 e.printStackTrace();
