@@ -82,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
             //Set longitude on TextView
             textView2.setText(Html.fromHtml(
                     "<font color= '#6200EE'><b>Longitud :</b><br></font>"
-                            + location.getLatitude()
+                            + location.getLongitude()
             ));
             //Set time stamp
             textView3.setText(Html.fromHtml(
@@ -90,8 +90,8 @@ public class MainActivity extends AppCompatActivity {
                             + new Date().toString()));
             //Set message
             txtMessage = ("\n" +
-                    "Latitud:_"+ location.getLatitude()+",\n"+
-                    "Longitud:_"+location.getLatitude()+",\n"+
+                    "Latitud:_"+location.getLatitude()+",\n"+
+                    "Longitud:_"+location.getLongitude()+",\n"+
                     "TimeStamp:_"+new Date().toString());
         }
     }
@@ -111,8 +111,8 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void run() {
             enviarr();
-            Toast.makeText(getApplicationContext(), "Send UDP", Toast.LENGTH_SHORT).show();
-            mHandler.postDelayed(this, 5000);
+            Toast.makeText(getApplicationContext(), "Sent UDP message", Toast.LENGTH_SHORT).show();
+            mHandler.postDelayed(this, 10000);
         }
     };
 
