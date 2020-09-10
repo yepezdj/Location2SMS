@@ -14,6 +14,7 @@ import android.text.Html;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -45,13 +46,11 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         //Assing variable
-        //btLocation = findViewById(R.id.bt_location);
+
         textView1 = findViewById(R.id.text_view1);
         textView2 = findViewById(R.id.text_view2);
         textView3 = findViewById(R.id.text_view3);
-        //textView4 = findViewById(R.id.text_view4);
-        //textView5 = findViewById(R.id.text_view5);
-        //cancel = (Button) findViewById(R.id.cancel);
+
         editip = findViewById(R.id.Edit_ip);
 
         //Initialize focusedLocationProviderClient
@@ -65,6 +64,7 @@ public class MainActivity extends AppCompatActivity {
             ActivityCompat.requestPermissions(MainActivity.this
                     , new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 44);
         }
+
         LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         LocationListener locationListener = new MyLocationListener();
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
@@ -111,6 +111,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void run() {
             enviarr();
+            Toast.makeText(getApplicationContext(), "Send UDP", Toast.LENGTH_SHORT).show();
             mHandler.postDelayed(this, 5000);
         }
     };
@@ -121,68 +122,6 @@ public class MainActivity extends AppCompatActivity {
         new UDPClient().execute(txtMessage);
     }
 
-
-
-
-    /*public void getLocation() {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this
-                , Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            //getLocation();
-            return;
-        }
-
-        fusedLocationProviderClient.getLastLocation().addOnCompleteListener(new OnCompleteListener<Location>() {
-            @Override
-            public void onComplete(@NonNull Task<Location> task) {
-                //Initialize location
-                Location location = task.getResult();
-                if (location != null) {
-                    try {
-                        //Initialize geoCoder
-                        Geocoder geocoder = new Geocoder(MainActivity.this,
-                                Locale.getDefault());
-                        //Initialize address list
-                        List<Address> addresses = geocoder.getFromLocation(
-                                location.getLatitude(), location.getLongitude(), 1);
-                        //Set latitude on TextView
-                        textView1.setText(Html.fromHtml(
-                                "<font color= '#6200EE'><b>Latitud :</b><br></font>"
-                                        + addresses.get(0).getLatitude()
-                        ));
-                        //Set longitude on TextView
-                        textView2.setText(Html.fromHtml(
-                                "<font color= '#6200EE'><b>Longitud :</b><br></font>"
-                                        + addresses.get(0).getLongitude()
-                        ));
-                        //Set country name
-                        textView3.setText(Html.fromHtml(
-                                "<font color= '#6200EE'><b>País :</b><br></font>"
-                                        + addresses.get(0).getCountryName()
-                        ));
-                        //Set locality
-                        textView4.setText(Html.fromHtml(
-                                "<font color= '#6200EE'><b>Ciudad :</b><br></font>"
-                                        + addresses.get(0).getLocality()
-                        ));
-                        //Set address
-                        textView5.setText(Html.fromHtml(
-                                "<font color= '#6200EE'><b>TimeStamp :</b><br></font>"
-                                        +new Date().toString()
-                        ));
-                        //Set message
-                        txtMessage = ("\n" +
-                                "Latitud: "+addresses.get(0).getLatitude()+",\n"+
-                                "Longitud: "+addresses.get(0).getLongitude()+",\n"+
-                                "TimeStamp: "+new Date().toString());
-
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        });
-
-    }*/
 
 
     @SuppressLint("StaticFieldLeak")
@@ -201,8 +140,6 @@ public class MainActivity extends AppCompatActivity {
 
                 DatagramPacket out = new DatagramPacket(outData, outData.length, ip, 11000);
                 socket.send(out);
-
-                //Toast.makeText(getApplicationContext(), "Send UDP", Toast.LENGTH_SHORT).show();
 
             } catch (SocketException e) {
                 e.printStackTrace();
