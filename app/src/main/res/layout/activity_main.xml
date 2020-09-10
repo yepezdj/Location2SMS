@@ -9,12 +9,9 @@
     android:padding="16dp"
     tools:context=".MainActivity">
 
-    <Button
-        android:id="@+id/bt_location"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="startRepeating"
-        android:text="Obtener coordenadas" />
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="67dp" />
 
     <EditText
         android:id="@+id/Edit_ip"
@@ -23,6 +20,13 @@
         android:ems="10"
         android:hint="Direccion IP"
         android:inputType="number|textAutoComplete" />
+
+    <Button
+        android:id="@+id/bt_location"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="startRepeating"
+        android:text="Enviar" />
 
     <Button
         android:id="@+id/cancel"
@@ -63,23 +67,13 @@
             android:layout_height="wrap_content"
             android:layout_weight="1" />
 
-        <TextView
-            android:id="@+id/text_view4"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1" />
-
     </LinearLayout>
-
-    <TextView
-        android:id="@+id/text_view5"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="67dp" />
+        android:layout_height="33dp">
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <ImageView
         android:id="@+id/imageView"
