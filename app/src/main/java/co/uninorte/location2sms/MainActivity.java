@@ -38,9 +38,9 @@ public class MainActivity extends AppCompatActivity {
     //Direcciones Ip's de las instancias de AWS
 
 
-    //String ip1 = "3.215.220.179";
-    //String ip2 = "54.227.210.76";
-    //String ip3;
+    String ip1 = "3.215.220.179";
+    String ip2 = "54.227.210.76";
+    String ip3 = "18.204.193.250";
     @SuppressWarnings("deprecation")
     private Handler mHandler = new Handler();
 
@@ -134,18 +134,18 @@ public class MainActivity extends AppCompatActivity {
             try {
                 String message = voids[0];
 
-                //InetAddress ip_1 = InetAddress.getByName(ip1);
-                InetAddress ip = InetAddress.getByName("54.227.210.76");
-                //InetAddress ip_3 = InetAddress.getByName(ip3);
+                InetAddress ip_1 = InetAddress.getByName(ip1);
+                InetAddress ip = InetAddress.getByName(ip2);
+                InetAddress ip_3 = InetAddress.getByName(ip3);
                 DatagramSocket socket = new DatagramSocket();
                 byte[] outData = (message).getBytes();
 
-                //DatagramPacket out_1 = new DatagramPacket(outData, outData.length, ip_1, 11000);
-                //socket.send(out_1);
-                DatagramPacket out = new DatagramPacket(outData, outData.length, ip, 11000);
-                socket.send(out);
-                //DatagramPacket out_3 = new DatagramPacket(outData, outData.length, ip_3, 11000);
-                //socket.send(out_3);
+                DatagramPacket out_1 = new DatagramPacket(outData, outData.length, ip_1, 11000);
+                socket.send(out_1);
+                DatagramPacket out_2 = new DatagramPacket(outData, outData.length, ip, 11000);
+                socket.send(out_2);
+                DatagramPacket out_3 = new DatagramPacket(outData, outData.length, ip_3, 11000);
+                socket.send(out_3);
 
 
             } catch (SocketException e) {
