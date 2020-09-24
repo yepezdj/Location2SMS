@@ -31,11 +31,16 @@ import java.util.Date;
 
 public class MainActivity extends AppCompatActivity {
     //Initialize variable
-    TextView textView1, textView2, textView3, textView4, textView5;
+    TextView textView1, textView2, textView3;
     FusedLocationProviderClient fusedLocationProviderClient;
 
     String txtMessage;
-    EditText editip;
+    //Direcciones Ip's de las instancias de AWS
+
+
+    //String ip1 = "3.215.220.179";
+    //String ip2 = "54.227.210.76";
+    //String ip3;
     @SuppressWarnings("deprecation")
     private Handler mHandler = new Handler();
 
@@ -50,8 +55,6 @@ public class MainActivity extends AppCompatActivity {
         textView1 = findViewById(R.id.text_view1);
         textView2 = findViewById(R.id.text_view2);
         textView3 = findViewById(R.id.text_view3);
-
-        editip = findViewById(R.id.Edit_ip);
 
         //Initialize focusedLocationProviderClient
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
@@ -89,10 +92,7 @@ public class MainActivity extends AppCompatActivity {
                     "<font color= '#6200EE'><b>TimeStamp :</b><br></font>"
                             + new Date().toString()));
             //Set message
-            txtMessage = ("\n" +
-                    "Latitud:_"+location.getLatitude()+",\n"+
-                    "Longitud:_"+location.getLongitude()+",\n"+
-                    "TimeStamp:_"+new Date().toString());
+            txtMessage = (location.getLatitude()+","+location.getLongitude()+","+new Date().toString());
         }
     }
 
@@ -112,7 +112,7 @@ public class MainActivity extends AppCompatActivity {
         public void run() {
             enviarr();
             Toast.makeText(getApplicationContext(), "Sent UDP message", Toast.LENGTH_SHORT).show();
-            mHandler.postDelayed(this, 10000);
+            mHandler.postDelayed(this, 5000);
         }
     };
 
@@ -134,12 +134,19 @@ public class MainActivity extends AppCompatActivity {
             try {
                 String message = voids[0];
 
-                InetAddress ip = InetAddress.getByName(editip.getText().toString());
+                //InetAddress ip_1 = InetAddress.getByName(ip1);
+                InetAddress ip = InetAddress.getByName("54.227.210.76");
+                //InetAddress ip_3 = InetAddress.getByName(ip3);
                 DatagramSocket socket = new DatagramSocket();
                 byte[] outData = (message).getBytes();
 
+                //DatagramPacket out_1 = new DatagramPacket(outData, outData.length, ip_1, 11000);
+                //socket.send(out_1);
                 DatagramPacket out = new DatagramPacket(outData, outData.length, ip, 11000);
                 socket.send(out);
+                //DatagramPacket out_3 = new DatagramPacket(outData, outData.length, ip_3, 11000);
+                //socket.send(out_3);
+
 
             } catch (SocketException e) {
                 e.printStackTrace();

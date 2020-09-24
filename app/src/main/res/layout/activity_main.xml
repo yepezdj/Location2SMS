@@ -11,15 +11,7 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="67dp" />
-
-    <EditText
-        android:id="@+id/Edit_ip"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:hint="Direccion IP"
-        android:inputType="number|textAutoComplete" />
+        android:layout_height="33dp" />
 
     <Button
         android:id="@+id/bt_location"
