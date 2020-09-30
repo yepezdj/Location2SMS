@@ -11,6 +11,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.Html;
+import android.text.format.DateFormat;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -34,13 +35,14 @@ public class MainActivity extends AppCompatActivity {
     TextView textView1, textView2, textView3;
     FusedLocationProviderClient fusedLocationProviderClient;
 
-    String txtMessage;
+    String txtMessage, date;
     //Direcciones Ip's de las instancias de AWS
 
 
     String ip1 = "3.215.220.179";
     String ip2 = "54.227.210.76";
     String ip3 = "18.204.193.250";
+    //String ip3 = "167.0.204.210";
     @SuppressWarnings("deprecation")
     private Handler mHandler = new Handler();
 
@@ -92,7 +94,8 @@ public class MainActivity extends AppCompatActivity {
                     "<font color= '#6200EE'><b>TimeStamp :</b><br></font>"
                             + new Date().toString()));
             //Set message
-            txtMessage = (location.getLatitude()+","+location.getLongitude()+","+new Date().toString());
+            String date = (DateFormat.format("dd-MM-yyyy hh:mm:ss", new java.util.Date()).toString());
+            txtMessage = (location.getLatitude()+","+location.getLongitude()+","+(DateFormat.format("yyyy-MM-ddTHH:mm:ss", new java.util.Date()).toString()));
         }
     }
 
