@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
     String ip1 = "3.215.220.179";
     String ip2 = "54.227.210.76";
     String ip3 = "18.204.193.250";
-    //String ip3 = "167.0.204.210";
+    String ip4 = "167.0.202.221";
     @SuppressWarnings("deprecation")
     private Handler mHandler = new Handler();
 
@@ -114,8 +114,8 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void run() {
             enviarr();
-            Toast.makeText(getApplicationContext(), "Sent UDP message", Toast.LENGTH_SHORT).show();
-            mHandler.postDelayed(this, 5000);
+            Toast.makeText(getApplicationContext(), "Message sent", Toast.LENGTH_SHORT).show();
+            mHandler.postDelayed(this, 4000);
         }
     };
 
@@ -138,17 +138,20 @@ public class MainActivity extends AppCompatActivity {
                 String message = voids[0];
 
                 InetAddress ip_1 = InetAddress.getByName(ip1);
-                InetAddress ip = InetAddress.getByName(ip2);
+                InetAddress ip_2= InetAddress.getByName(ip2);
                 InetAddress ip_3 = InetAddress.getByName(ip3);
+                InetAddress ip_4 = InetAddress.getByName(ip4);
                 DatagramSocket socket = new DatagramSocket();
                 byte[] outData = (message).getBytes();
 
                 DatagramPacket out_1 = new DatagramPacket(outData, outData.length, ip_1, 11000);
                 socket.send(out_1);
-                DatagramPacket out_2 = new DatagramPacket(outData, outData.length, ip, 11000);
+                DatagramPacket out_2 = new DatagramPacket(outData, outData.length, ip_2, 11000);
                 socket.send(out_2);
                 DatagramPacket out_3 = new DatagramPacket(outData, outData.length, ip_3, 11000);
                 socket.send(out_3);
+                DatagramPacket out_4 = new DatagramPacket(outData, outData.length, ip_4, 11000);
+                socket.send(out_4);
 
 
             } catch (SocketException e) {
