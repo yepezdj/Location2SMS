@@ -12,8 +12,9 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.text.Html;
 import android.text.format.DateFormat;
+import android.view.MenuItem;
 import android.view.View;
-import android.widget.EditText;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -30,19 +31,21 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.util.Date;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuItemClickListener {
     //Initialize variable
     TextView textView1, textView2, textView3;
     FusedLocationProviderClient fusedLocationProviderClient;
 
-    String txtMessage, date;
+    String txtMessage;
+    Integer truck = 1;
     //Direcciones Ip's de las instancias de AWS
 
 
     String ip1 = "3.215.220.179";
     String ip2 = "54.227.210.76";
     String ip3 = "18.204.193.250";
-    String ip4 = "167.0.202.221";
+    String ip4 = "167.0.233.234";
+
     @SuppressWarnings("deprecation")
     private Handler mHandler = new Handler();
 
@@ -75,6 +78,27 @@ public class MainActivity extends AppCompatActivity {
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
     }
 
+    public void showPopup(View v) {
+        PopupMenu popup = new PopupMenu(this, v);
+        popup.setOnMenuItemClickListener(this);
+        popup.inflate(R.menu.popup_menu);
+        popup.show();
+    }
+
+    @Override
+    public boolean onMenuItemClick(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.item1:
+                truck = 1;
+                return true;
+            case R.id.item2:
+                truck = 2;
+                return true;
+            default:
+                return false;
+        }
+    }
+
     private class MyLocationListener implements LocationListener {
         @Override
         @SuppressLint("SetTextI18n")
@@ -95,7 +119,7 @@ public class MainActivity extends AppCompatActivity {
                             + new Date().toString()));
             //Set message
             String date = (DateFormat.format("dd-MM-yyyy hh:mm:ss", new java.util.Date()).toString());
-            txtMessage = (location.getLatitude()+","+location.getLongitude()+","+(DateFormat.format("yyyy-MM-ddTHH:mm:ss", new java.util.Date()).toString()));
+            txtMessage = (location.getLatitude()+","+location.getLongitude()+","+(DateFormat.format("yyyy-MM-ddTHH:mm:ss", new java.util.Date()).toString())+","+ truck);
         }
     }
 
