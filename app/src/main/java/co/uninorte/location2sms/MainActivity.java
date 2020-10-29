@@ -4,16 +4,26 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.DhcpInfo;
+import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.Html;
 import android.text.format.DateFormat;
+import android.text.format.Formatter;
 import android.view.MenuItem;
+import android.view.Surface;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -30,11 +40,13 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.util.Date;
+import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuItemClickListener {
+public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuItemClickListener, SensorEventListener {
     //Initialize variable
     TextView textView1, textView2, textView3;
     FusedLocationProviderClient fusedLocationProviderClient;
+    private SensorManager sensorManager;
 
     String txtMessage;
     Integer truck = 1;
@@ -44,18 +56,26 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
     String ip1 = "3.215.220.179";
     String ip2 = "54.227.210.76";
     String ip3 = "18.204.193.250";
-    String ip4 = "167.0.233.234";
+    String ip4 = "167.0.214.64";
+    String xtext, ytext, ztext;
 
     @SuppressWarnings("deprecation")
     private Handler mHandler = new Handler();
 
+    public MainActivity() {
+    }
 
+
+    @SuppressLint("WrongViewCast")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         //Assing variable
+        SensorManager smm;
+        List<Sensor> sensor;
+        ListView lv;
 
         textView1 = findViewById(R.id.text_view1);
         textView2 = findViewById(R.id.text_view2);
@@ -76,6 +96,13 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
         LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         LocationListener locationListener = new MyLocationListener();
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+
+        sensorManager=(SensorManager)getSystemService(SENSOR_SERVICE);
+        // add listener. The listener will be  (this) class
+        sensorManager.registerListener(this,
+                sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
+                SensorManager.SENSOR_DELAY_NORMAL);
+
     }
 
     public void showPopup(View v) {
@@ -83,6 +110,25 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
         popup.setOnMenuItemClickListener(this);
         popup.inflate(R.menu.popup_menu);
         popup.show();
+    }
+
+
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+    }
+
+    public void onSensorChanged(SensorEvent event){
+        // check sensor type
+        if(event.sensor.getType()==Sensor.TYPE_ACCELEROMETER){
+
+            // assign directions
+            float x=event.values[0];
+            float y=event.values[1];
+            float z=event.values[2];
+
+            xtext = String.valueOf(x);
+            ytext = String.valueOf(y);
+            ztext = String.valueOf(z);
+        }
     }
 
     @Override
@@ -98,6 +144,7 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
                 return false;
         }
     }
+
 
     private class MyLocationListener implements LocationListener {
         @Override
@@ -119,7 +166,7 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
                             + new Date().toString()));
             //Set message
             String date = (DateFormat.format("dd-MM-yyyy hh:mm:ss", new java.util.Date()).toString());
-            txtMessage = (location.getLatitude()+","+location.getLongitude()+","+(DateFormat.format("yyyy-MM-ddTHH:mm:ss", new java.util.Date()).toString())+","+ truck);
+            txtMessage = (location.getLatitude()+","+location.getLongitude()+","+(DateFormat.format("yyyy-MM-ddTHH:mm:ss", new java.util.Date()).toString())+","+ truck+","+xtext+"/"+ytext+"/"+ztext);
         }
     }
 
