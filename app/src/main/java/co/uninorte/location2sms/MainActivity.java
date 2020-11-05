@@ -2,7 +2,11 @@ package co.uninorte.location2sms;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothSocket;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -11,36 +15,35 @@ import android.hardware.SensorManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.net.DhcpInfo;
-import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.Html;
 import android.text.format.DateFormat;
-import android.text.format.Formatter;
+import android.util.Log;
 import android.view.MenuItem;
-import android.view.Surface;
 import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
-
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
-
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.lang.reflect.Method;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.util.Date;
-import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+
 
 public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuItemClickListener, SensorEventListener {
     //Initialize variable
@@ -56,14 +59,32 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
     String ip1 = "3.215.220.179";
     String ip2 = "54.227.210.76";
     String ip3 = "18.204.193.250";
-    String ip4 = "167.0.214.64";
+    String ip4 = "167.0.221.165";
     String xtext, ytext, ztext;
+    String data ="";
+    boolean go = true;
+
+    //private UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
     @SuppressWarnings("deprecation")
     private Handler mHandler = new Handler();
 
+
     public MainActivity() {
     }
+
+    private BluetoothAdapter BluetoothAdap = null;
+    private Set Devices;
+    private static UUID MY_UUID = UUID.fromString("446118f0-8b1e-11e2-9e96-0800200c9a66");
+
+    // based on android.bluetooth.BluetoothAdapter
+    private BluetoothAdapter mAdapter;
+    private BluetoothDevice remoteDevice;
+    private BluetoothAdapter mBluetoothAdapter;
+    private BluetoothDevice mBluetoothDevice;
+    private BluetoothSocket mBluetoothSocket;
+    private UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
+    int bytess;
 
 
     @SuppressLint("WrongViewCast")
@@ -71,11 +92,6 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        //Assing variable
-        SensorManager smm;
-        List<Sensor> sensor;
-        ListView lv;
 
         textView1 = findViewById(R.id.text_view1);
         textView2 = findViewById(R.id.text_view2);
@@ -103,7 +119,26 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
                 sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
                 SensorManager.SENSOR_DELAY_NORMAL);
 
+        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+
+        try{
+
+            if(mBluetoothAdapter == null){
+                Log.d("bluetooth:", "device does not support bluetooth");
+            }
+            if(!mBluetoothAdapter.isEnabled()){
+                Intent enableBt = new Intent(
+                        BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                enableBt.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(enableBt);
+            }
+
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
+
 
     public void showPopup(View v) {
         PopupMenu popup = new PopupMenu(this, v);
@@ -164,18 +199,22 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
             textView3.setText(Html.fromHtml(
                     "<font color= '#6200EE'><b>TimeStamp :</b><br></font>"
                             + new Date().toString()));
+
             //Set message
-            String date = (DateFormat.format("dd-MM-yyyy hh:mm:ss", new java.util.Date()).toString());
-            txtMessage = (location.getLatitude()+","+location.getLongitude()+","+(DateFormat.format("yyyy-MM-ddTHH:mm:ss", new java.util.Date()).toString())+","+ truck+","+xtext+"/"+ytext+"/"+ztext);
+            txtMessage = (location.getLatitude()+","+location.getLongitude()+","+(DateFormat.format("yyyy-MM-ddTHH:mm:ss", new java.util.Date()).toString())+","+ truck+","+data);
+                    //"+xtext+"/"+ytext+"/"+ztext);
         }
     }
 
     public void stopRepeating(View v) {
+        go = false;
         mHandler.removeCallbacks(EnvioRunnable);
     }
 
     public void startRepeating(View v) {
         //mHandler.postDelayed(mToastRunnable, 5000);
+        go = true;
+        getData.start();
         EnvioRunnable.run();
     }
 
@@ -190,12 +229,43 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
         }
     };
 
-    
+
     public void enviarr() {
         //noinspection deprecation
         new UDPClient().execute(txtMessage);
     }
 
+    final Thread getData = new Thread() {
+        @Override
+        public void run() {
+            mBluetoothDevice = mBluetoothAdapter.getRemoteDevice("B8:27:EB:95:C4:9B");
+            try {
+                mBluetoothSocket = mBluetoothDevice.createRfcommSocketToServiceRecord(uuid);
+                mBluetoothSocket.connect();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            while (go == true) {
+                try {
+                    InputStream socketInputStream = mBluetoothSocket.getInputStream();
+                    byte[] buffer = new byte[1024];
+
+                    bytess = socketInputStream.read(buffer);
+                    data = new String(buffer, 0, bytess);
+
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+                try {
+                    //set time in mili
+                    Thread.sleep(2000);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    };
 
 
     @SuppressLint("StaticFieldLeak")
